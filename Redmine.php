@@ -81,6 +81,8 @@ class Redmine implements \PHPCI\Plugin
             return true;
         }
         */
+       
+        $this->phpci->log('+++ Check cache +++');
 
         $url = $this->server . '/issues/' . $matches[1] . '.json';
         $issue = array();
@@ -167,7 +169,7 @@ class Redmine implements \PHPCI\Plugin
             return false;
         }
         else {
-            $this->phpci->logSuccess(sprintf(
+            $this->phpci->log(sprintf(
                 'Response Redmine: %s',
                 $responseBody
             ));
