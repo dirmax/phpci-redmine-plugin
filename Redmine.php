@@ -134,11 +134,6 @@ class Redmine implements Plugin
             . '}}' . "\n";
         }
         
-        $this->phpci->log('----');
-        $this->phpci->log(print_r($this->build->getStatus(), 1));
-        $this->phpci->log('----');
-        
-
         $headers = array(
             'Content-Type: application/json',
             'X-Redmine-API-Key: ' . $this->apiKey,
