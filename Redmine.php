@@ -164,6 +164,12 @@ class Redmine implements \PHPCI\Plugin
 
             return false;
         }
+        else {
+            $this->phpci->logSuccess(sprintf(
+                'Response Redmine: %s',
+                $responseBody
+            ));
+        }
 
         return true;
     }
