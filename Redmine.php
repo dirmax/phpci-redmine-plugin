@@ -71,6 +71,7 @@ class Redmine implements \PHPCI\Plugin
 
     public function execute()
     {
+        /*
         if (!$this->enabled) {
             return true;
         }
@@ -79,6 +80,7 @@ class Redmine implements \PHPCI\Plugin
         if (!preg_match($this->issueRegexp, $this->build->getBranch(), $matches)) {
             return true;
         }
+        */
 
         $url = $this->server . '/issues/' . $matches[1] . '.json';
         $issue = array();
