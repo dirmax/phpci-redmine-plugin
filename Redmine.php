@@ -1,15 +1,14 @@
 <?php
-
 namespace Intaro\PHPCI\Plugin;
 
 use PHPCI\Builder;
+use PHPCI\Plugin;
 use PHPCI\Model\Build;
-use Symfony\Component\Yaml\Parser as YamlParser;
 
 /**
  * Update related Redmine issue with build status
  */
-class Redmine implements \PHPCI\Plugin
+class Redmine implements Plugin
 {
     const STATUS_PASSED = 2;
     const STATUS_FAILED = 3;
@@ -19,7 +18,7 @@ class Redmine implements \PHPCI\Plugin
 
     protected $server;
     protected $apiKey;
-    protected $issueRegexp = '/task-(\d+)/';
+    protected $issueRegexp = '/#(\d+)/';
 
     protected $enabled = true;
 
@@ -28,7 +27,10 @@ class Redmine implements \PHPCI\Plugin
     protected $percent;
 
     protected $lang = 'en';
-    protected $messages;
+    protected $messages = [
+        'passed'    => 'Passed %s',
+        'failed'    => 'Failed %s',
+    ];
 
     public function __construct(Builder $phpci, Build $build, array $options = array())
     {
@@ -36,7 +38,6 @@ class Redmine implements \PHPCI\Plugin
         $this->build = $build;
 
         $buildSettings = $phpci->getConfig('build_settings');
-
 
         if (isset($buildSettings['redmine'])) {
             $redmine = $buildSettings['redmine'];
@@ -63,32 +64,25 @@ class Redmine implements \PHPCI\Plugin
         if (isset($options['issue_regexp'])) {
             $this->issueRegexp = $options['issue_regexp'];
         }
-
-        $parser = new YamlParser();
-        $config = (array) $parser->parse(file_get_contents( __DIR__ . '/messages.yml' ));
-        $this->messages = $config[$this->lang];
     }
 
     public function execute()
     {
-        /*
         if (!$this->enabled) {
             return true;
         }
 
         $matches = array();
-        if (!preg_match($this->issueRegexp, $this->build->getBranch(), $matches)) {
+        if (!preg_match($this->issueRegexp, $this->build->getCommitMessage(), $matches)) {
             return true;
         }
-        */
-       
-        $this->phpci->log('+++ Check cache +++');
 
         $url = $this->server . '/issues/' . $matches[1] . '.json';
         $issue = array();
 
         $issue['notes'] =
-            '!' . $this->phpci->getSystemConfig('phpci.url') . '/build-status/image/' .
+            'Commit: *' . $this->build->getCommitMessage() . "*\n"
+            . '!' . $this->phpci->getSystemConfig('phpci.url') . '/build-status/image/' .
             $this->build->getProjectId() . '?branch=' . $this->build->getBranch() . '!' .
             "\n\n"
         ;
@@ -135,7 +129,15 @@ class Redmine implements \PHPCI\Plugin
 
         } elseif (self::STATUS_FAILED == $this->build->getStatus()) {
             $issue['notes'] .= sprintf($this->messages['failed'], $buildLink) . "\n";
+            $issue['notes'] .= '{{collapse(View details...)' . "\n"
+                . '<pre>' . $this->build->getLog() . "</pre>\n"
+            . '}}' . "\n";
         }
+        
+        $this->phpci->log('----');
+        $this->phpci->log(print_r($this->build->getStatus(), 1));
+        $this->phpci->log('----');
+        
 
         $headers = array(
             'Content-Type: application/json',
@@ -167,12 +169,6 @@ class Redmine implements \PHPCI\Plugin
             ));
 
             return false;
-        }
-        else {
-            $this->phpci->log(sprintf(
-                'Response Redmine: %s',
-                $responseBody
-            ));
         }
 
         return true;

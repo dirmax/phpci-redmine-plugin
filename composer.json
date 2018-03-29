@@ -9,8 +9,7 @@
         }
     ],
     "require": {
-        "php": ">=5.3.3",
-        "symfony/yaml": "^4"
+        "php": ">=5.3.3"
     },
     "target-dir": "Intaro/PHPCI/Plugin",
     "autoload": {
