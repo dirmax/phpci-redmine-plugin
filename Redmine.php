@@ -1,14 +1,14 @@
 <?php
 namespace Intaro\PHPCI\Plugin;
 
-use PHPCI\Builder;
-use PHPCI\Plugin;
-use PHPCI\Model\Build;
+use PHPCensor\Builder;
+use PHPCensor\Plugin;
+use PHPCensor\Model\Build;
 
 /**
  * Update related Redmine issue with build status
  */
-class Redmine implements Plugin
+class Redmine extends Plugin
 {
     const STATUS_PASSED = 2;
     const STATUS_FAILED = 3;
@@ -133,7 +133,7 @@ class Redmine implements Plugin
                 . '<pre>' . $this->build->getLog() . "</pre>\n"
             . '}}' . "\n";
         }
-        
+
         $headers = array(
             'Content-Type: application/json',
             'X-Redmine-API-Key: ' . $this->apiKey,
