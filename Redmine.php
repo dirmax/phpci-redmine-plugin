@@ -25,6 +25,7 @@ class Redmine extends Plugin
     protected $status;
     protected $prevStatus;
     protected $percent;
+    protected $urlBuild;
 
     protected $lang = 'en';
     protected $messages = [
@@ -64,6 +65,9 @@ class Redmine extends Plugin
         if (isset($options['issue_regexp'])) {
             $this->issueRegexp = $options['issue_regexp'];
         }
+        if (isset($options['url_build'])) {
+            $this->urlBuild = $options['url_build'];
+        }
     }
 
     public function execute()
@@ -82,6 +86,10 @@ class Redmine extends Plugin
 
         $issue['notes'] =
             'Commit: *' . $this->build->getCommitMessage() . "*\n"
+            . ($this->urlBuild
+                ? 'Build URL: [[' .$this->urlBuild  . "]]\n"
+                : ''
+            )
             . '!' . $this->phpci->getSystemConfig('phpci.url') . '/build-status/image/' .
             $this->build->getProjectId() . '?branch=' . $this->build->getBranch() . '!' .
             "\n\n"
