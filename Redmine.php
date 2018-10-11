@@ -87,7 +87,7 @@ class Redmine extends Plugin
         $issue['notes'] =
             'Commit: *' . $this->build->getCommitMessage() . "*\n"
             . ($this->urlBuild
-                ? 'Build URL: [[' .$this->urlBuild  . "]]\n"
+                ? 'Build URL: ' . $this->phpci->interpolate($this->urlBuild)  . "\n"
                 : ''
             )
 
