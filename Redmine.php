@@ -87,15 +87,16 @@ class Redmine extends Plugin
         $issue['notes'] =
             'Commit: *' . $this->build->getCommitMessage() . "*\n"
             . ($this->urlBuild
-                ? 'Build URL: [[' .$this->urlBuild  . "]]\n"
+                ? 'Build URL: ' . $this->phpci->interpolate($this->urlBuild)  . "\n"
                 : ''
             )
-            . '!' . $this->phpci->getSystemConfig('phpci.url') . '/build-status/image/' .
+
+            . '!' . $this->phpci->getSystemConfig('php-censor.url') . '/build-status/image/' .
             $this->build->getProjectId() . '?branch=' . $this->build->getBranch() . '!' .
             "\n\n"
         ;
 
-        $buildLink = $this->phpci->getSystemConfig('phpci.url') . '/build/view/' . $this->build->getId();
+        $buildLink = $this->phpci->getSystemConfig('php-censor.url') . '/build/view/' . $this->build->getId();
 
         if (self::STATUS_PASSED == $this->build->getStatus()) {
             $issue['notes'] .= sprintf($this->messages['passed'], $buildLink) . "\n";
